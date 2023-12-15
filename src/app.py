@@ -37,12 +37,15 @@ def handle_hello():
 
     return jsonify(response_body), 200
 
-@app.route('/members/<id>', methods=['GET'], )
+@app.route('/members/<int:member_id>', methods=['GET'], )
 def handle_get_one_member(id):
-    jackson_family.get_member(id)
-    return id, 200
+    member = jackson_family.get_member(int (id))
+    
+    if member is None:
+        return jsonify ({"error": "Member not found"}), 400
+    return jsonify(member), 200 
 
-@app.route('/members', methods=["POST"])
+@app.route('/members', methods=['POST'])
 def handle_add_member():
     json_data = request.get_json()
     required_keys = ["first_name", "age", "lucky_numbers"]
@@ -61,6 +64,14 @@ def handle_add_member():
 
     inner_member_data = jackson_family.add_member(new_member)
     return jsonify(inner_member_data), 201
+
+@app.route('/members/<int:member_id>', methods=['DELETE'])
+def handle_delete_member (id):
+    deleted = jackson_family.delete_member (int(id))
+    
+    return jsonify(deleted), 200
+    
+
     
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
